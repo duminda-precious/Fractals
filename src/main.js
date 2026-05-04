@@ -35,8 +35,8 @@ registerModifier('facetAnimate', facetAnimateModifier);
 // Add new SDF shapes here — one line per shape.
 const SDF_FACTORIES = {
   mandelbulb: createMandelbulbRenderer,
-  crystal:    createCrystalRenderer,
-  mandelbox:  createMandelboxRenderer,
+  crystal: createCrystalRenderer,
+  mandelbox: createMandelboxRenderer,
 };
 
 const pipeline = {
@@ -69,14 +69,14 @@ const pipeline = {
     }
   ],
   mandelbulb: getMandelbulbDefaults(),
-  crystal:    getCrystalDefaults(),
-  mandelbox:  getMandelboxDefaults(),
+  crystal: getCrystalDefaults(),
+  mandelbox: getMandelboxDefaults(),
   rotation: { x: 0, y: 0, z: 0 }
 };
 
 export const api = {
   randomizeJuliaC() {
-    const rand   = mulberry32(deriveSeed(pipeline.masterSeed, 'mandelbulb-julia'));
+    const rand = mulberry32(deriveSeed(pipeline.masterSeed, 'mandelbulb-julia'));
     const params = pipeline[pipeline.shapeType];
     if (params?.juliaC) {
       params.juliaC = [rand() - 0.5, rand() - 0.5, rand() - 0.5];
@@ -84,10 +84,10 @@ export const api = {
     }
     refreshDisplays();
   },
-  regenerate()    { regenerate(); },
+  regenerate() { regenerate(); },
   resetRotation() { objectControls?.reset(); },
-  applyZoom()     { applyZoom(); },
-  resetZoom()     { pipeline.zoom = ZOOM.default; applyZoom(); refreshDisplays(); }
+  applyZoom() { applyZoom(); },
+  resetZoom() { pipeline.zoom = ZOOM.default; applyZoom(); refreshDisplays(); }
 };
 
 const container = document.getElementById('app');
@@ -97,7 +97,7 @@ let _restorationTimer = null;
 function sdfInteractionStart() {
   if (!sdfRenderer) return;
   clearTimeout(_restorationTimer);
-  renderer.setSize(window.innerWidth / 2, window.innerHeight / 2, false);
+  renderer.setSize(window.innerWidth / 1, window.innerHeight / 1, false);
 }
 function sdfInteractionEnd() {
   if (!sdfRenderer) return;
@@ -133,7 +133,7 @@ const { renderer, scene, camera } = createScene(container, {
 
 const objectControls = createObjectControls(renderer.domElement, {
   onDragStart: () => sdfInteractionStart(),
-  onDragEnd:   () => sdfInteractionEnd(),
+  onDragEnd: () => sdfInteractionEnd(),
   onChange: (q) => {
     if (sdfRenderer) {
       sdfRenderer.setRotation(objectControls.getInverseMatrix3());
@@ -147,18 +147,18 @@ const objectControls = createObjectControls(renderer.domElement, {
 // Link scroll wheel to zoom
 renderer.domElement.addEventListener('wheel', (e) => {
   e.preventDefault();
-  
+
   // Determine zoom direction: scroll up (negative deltaY) = zoom in (positive delta)
   const delta = -Math.sign(e.deltaY);
-  
+
   const newZoom = pipeline.zoom + delta * ZOOM.step;
   pipeline.zoom = Math.max(ZOOM.min, Math.min(ZOOM.max, newZoom));
-  
+
   applyZoom();
   refreshDisplays();
 }, { passive: false });
 
-let currentRoot  = null;
+let currentRoot = null;
 let currentSlots = null;
 
 function clearCurrent() {
@@ -200,7 +200,7 @@ function regenerate() {
     currentRoot = sdfRenderer.mesh;
     camera.position.set(...CAMERA.positionSDF);
     camera.near = CAMERA.near;
-    camera.far  = CAMERA.farSDF;
+    camera.far = CAMERA.farSDF;
     camera.lookAt(0, 0, 0);
     applyZoom();
     sdfRenderer.syncCamera(camera);
