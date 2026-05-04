@@ -10,7 +10,7 @@ export function execute(pipeline) {
   // 1. Base generator
   try {
     const baseDef = getGenerator(pipeline.base.type);
-    const baseSeed = deriveSeed(pipeline.masterSeed, 'base');
+    const baseSeed = deriveSeed(4242, 'base');
     const baseGeo = baseDef.run(pipeline.base.params, baseSeed);
     slots.set(pipeline.base.outputSlot, baseGeo);
   } catch (e) {
@@ -29,7 +29,7 @@ export function execute(pipeline) {
 
     const seed = mod.params?.seed != null
       ? mod.params.seed
-      : deriveSeed(pipeline.masterSeed, mod.id);
+      : deriveSeed(4242, mod.id);
 
     try {
       let result;

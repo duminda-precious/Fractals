@@ -12,14 +12,3 @@ export function disposeObject(obj, { disposeMaterials = false } = {}) {
   if (obj.parent) obj.parent.remove(obj);
 }
 
-// Dispose a bare BufferGeometry or Group of geometries (no scene attachment).
-export function disposeGeometry(geo) {
-  if (!geo) return;
-  if (geo.isBufferGeometry) {
-    geo.dispose();
-  } else if (geo.traverse) {
-    geo.traverse((child) => {
-      if (child.geometry) child.geometry.dispose();
-    });
-  }
-}

@@ -16,7 +16,3 @@ export const wireframeMaterial = new THREE.MeshBasicMaterial({
   depthWrite: false
 });
 
-export const materials = {
-  clay: clayMaterial,
-  wireframe: wireframeMaterial
-};

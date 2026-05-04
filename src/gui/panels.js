@@ -43,19 +43,10 @@ export function buildGUI(pipeline, { onChange, api } = {}) {
     .onChange(() => api?.applyZoom?.());
   view.add({ reset: () => api?.resetZoom?.() }, 'reset').name('Reset Zoom');
   rotControllers = [
-    view.add(pipeline.rotation, 'x').name('Rot X').decimals(1).disable(),
-    view.add(pipeline.rotation, 'y').name('Rot Y').decimals(1).disable(),
-    view.add(pipeline.rotation, 'z').name('Rot Z').decimals(1).disable(),
+    view.add(pipeline.rotation, 'x', -180, 180).name('Rot X').decimals(1).onChange(() => api?.pushRotation?.()),
+    view.add(pipeline.rotation, 'y', -180, 180).name('Rot Y').decimals(1).onChange(() => api?.pushRotation?.()),
+    view.add(pipeline.rotation, 'z', -180, 180).name('Rot Z').decimals(1).onChange(() => api?.pushRotation?.()),
   ];
   view.add({ resetRotation: () => api?.resetRotation?.() }, 'resetRotation').name('Reset Rotation');
 
-  const seed = gui.addFolder('Randomness');
-  seed.add(pipeline, 'masterSeed').name('Seed').onChange(() => onChange?.());
-  seed.add({
-    randomize() {
-      pipeline.masterSeed = Math.floor(Math.random() * 1_000_000);
-      if (pipeline[pipeline.shapeType]?.juliaMode) api?.randomizeJuliaC?.();
-      onChange?.(true);
-    }
-  }, 'randomize').name('Randomize');
 }

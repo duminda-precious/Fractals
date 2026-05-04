@@ -24,6 +24,3 @@ export function getModifier(type) {
   return m;
 }
 
-export function listModifiers() {
-  return [...modifierRegistry.entries()].map(([type, def]) => ({ type, label: def.label }));
-}

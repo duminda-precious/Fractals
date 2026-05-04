@@ -12,7 +12,7 @@ export function createSharpnessProxy(target) {
   };
 }
 
-export function buildJuliaModeGUI(gui, params, [juliaMin, juliaMax], api, { onChange } = {}) {
+export function buildJuliaModeGUI(gui, params, [juliaMin, juliaMax], { onChange } = {}) {
   const julia = gui.addFolder('Julia Mode');
   julia.add(params, 'juliaMode')
     .name('Enable Julia')
@@ -28,5 +28,5 @@ export function buildJuliaModeGUI(gui, params, [juliaMin, juliaMax], api, { onCh
   julia.add(cProxy, 'cx', juliaMin, juliaMax, 0.0001).name('Julia C.x').onChange(() => onChange?.());
   julia.add(cProxy, 'cy', juliaMin, juliaMax, 0.0001).name('Julia C.y').onChange(() => onChange?.());
   julia.add(cProxy, 'cz', juliaMin, juliaMax, 0.0001).name('Julia C.z').onChange(() => onChange?.());
-  julia.add({ randomize: () => api?.randomizeJuliaC?.() }, 'randomize').name('Randomize Julia C');
+
 }

@@ -17,7 +17,7 @@ import { buildGUI, refreshDisplays, refreshRotation } from './gui/panels.js';
 import { updateTriangleCounter } from './gui/triangleCounter.js';
 import { debounce } from './utils/debounce.js';
 import { disposeObject } from './utils/dispose.js';
-import { mulberry32, deriveSeed } from './utils/prng.js';
+
 import { createMandelbulbRenderer, getMandelbulbDefaults } from './renderers/mandelbulbRenderer.js';
 import { createCrystalRenderer, getCrystalDefaults } from './renderers/crystalRenderer.js';
 import { createMandelboxRenderer, getMandelboxDefaults } from './renderers/mandelboxRenderer.js';
@@ -42,7 +42,7 @@ const SDF_FACTORIES = {
 const pipeline = {
   shapeType: 'mandelbulb',
   zoom: ZOOM.default,
-  masterSeed: 4242,
+
   outputSlot: 'final',
   wireframeOverlay: true,
   base: {
@@ -75,19 +75,26 @@ const pipeline = {
 };
 
 export const api = {
-  randomizeJuliaC() {
-    const rand = mulberry32(deriveSeed(pipeline.masterSeed, 'mandelbulb-julia'));
-    const params = pipeline[pipeline.shapeType];
-    if (params?.juliaC) {
-      params.juliaC = [rand() - 0.5, rand() - 0.5, rand() - 0.5];
-      sdfRenderer?.setUniforms(params);
-    }
-    refreshDisplays();
-  },
   regenerate() { regenerate(); },
   resetRotation() { objectControls?.reset(); },
   applyZoom() { applyZoom(); },
-  resetZoom() { pipeline.zoom = ZOOM.default; applyZoom(); refreshDisplays(); }
+  resetZoom() { pipeline.zoom = ZOOM.default; applyZoom(); refreshDisplays(); },
+  pushRotation() {
+    const q = new THREE.Quaternion().setFromEuler(
+      new THREE.Euler(
+        THREE.MathUtils.degToRad(pipeline.rotation.x),
+        THREE.MathUtils.degToRad(pipeline.rotation.y),
+        THREE.MathUtils.degToRad(pipeline.rotation.z),
+        'XYZ'
+      )
+    );
+    objectControls.quaternion.copy(q);
+    if (sdfRenderer) {
+      sdfRenderer.setRotation(objectControls.getInverseMatrix3());
+    } else if (currentRoot) {
+      currentRoot.quaternion.copy(q);
+    }
+  }
 };
 
 const container = document.getElementById('app');
@@ -149,7 +156,7 @@ renderer.domElement.addEventListener('wheel', (e) => {
   e.preventDefault();
 
   // Determine zoom direction: scroll up (negative deltaY) = zoom in (positive delta)
-  const delta = -Math.sign(e.deltaY);
+  const delta = -Math.sign(e.deltaY) * 3;
 
   const newZoom = pipeline.zoom + delta * ZOOM.step;
   pipeline.zoom = Math.max(ZOOM.min, Math.min(ZOOM.max, newZoom));

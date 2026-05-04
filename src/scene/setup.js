@@ -33,6 +33,7 @@ export function createScene(container, { onBeforeRender } = {}) {
   window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, PIXEL_RATIO.mesh));
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
