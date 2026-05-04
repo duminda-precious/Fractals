@@ -144,6 +144,20 @@ const objectControls = createObjectControls(renderer.domElement, {
   }
 });
 
+// Link scroll wheel to zoom
+renderer.domElement.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  
+  // Determine zoom direction: scroll up (negative deltaY) = zoom in (positive delta)
+  const delta = -Math.sign(e.deltaY);
+  
+  const newZoom = pipeline.zoom + delta * ZOOM.step;
+  pipeline.zoom = Math.max(ZOOM.min, Math.min(ZOOM.max, newZoom));
+  
+  applyZoom();
+  refreshDisplays();
+}, { passive: false });
+
 let currentRoot  = null;
 let currentSlots = null;
 
