@@ -21,21 +21,3 @@ export function collectSlotNames(pipeline) {
   return [...names];
 }
 
-// Count triangles across a BufferGeometry or a Group (sums children).
-export function countTriangles(value) {
-  if (!value) return 0;
-  if (value.isBufferGeometry) {
-    const idx = value.index;
-    if (idx) return idx.count / 3;
-    const pos = value.attributes.position;
-    return pos ? pos.count / 3 : 0;
-  }
-  if (value.isObject3D) {
-    let count = 0;
-    value.traverse((c) => {
-      if (c.isMesh && c.geometry) count += countTriangles(c.geometry);
-    });
-    return count;
-  }
-  return 0;
-}

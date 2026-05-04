@@ -1,26 +1,40 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Procedural 3D Tool</title>
-    <style>
-      html, body { margin: 0; padding: 0; height: 100%; background: #111416; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; color: #e8e0d8; }
-      #app { position: fixed; inset: 0; }
-      canvas { display: block; }
-      .lil-gui { --width: 320px; }
-      #tri-counter {
-        position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
-        background: rgba(20,22,24,0.85); padding: 6px 14px; border-radius: 6px;
-        font-size: 13px; font-variant-numeric: tabular-nums; pointer-events: none;
-        border: 1px solid rgba(255,255,255,0.08); z-index: 10;
-      }
-      #tri-counter .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
-    </style>
-  </head>
-  <body>
-    <div id="app"></div>
-    <div id="tri-counter"><span class="dot" style="background:#7ed957"></span><span id="tri-text">0 triangles</span></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Procedural 3D Tool</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #111416;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #e8e0d8;
+    }
+
+    #app {
+      position: fixed;
+      inset: 0;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    .lil-gui {
+      --width: 320px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>

@@ -4,7 +4,7 @@ import { createObjectControls } from './scene/objectControls.js';
 import { clayMaterial, wireframeMaterial } from './scene/materials.js';
 import { registerGenerator, registerModifier } from './pipeline/registry.js';
 import { execute } from './pipeline/engine.js';
-import { countTriangles } from './pipeline/slots.js';
+
 import { geodesicGenerator } from './generators/geodesic.js';
 import { polyhedronGenerator } from './generators/polyhedron.js';
 import { noiseDisplaceModifier } from './modifiers/noiseDisplace.js';
@@ -14,7 +14,7 @@ import { mergeModifier } from './modifiers/merge.js';
 import { faceExplodeModifier } from './modifiers/faceExplode.js';
 import { facetAnimateModifier } from './modifiers/facetAnimate.js';
 import { buildGUI, refreshDisplays, refreshRotation } from './gui/panels.js';
-import { updateTriangleCounter } from './gui/triangleCounter.js';
+
 import { debounce } from './utils/debounce.js';
 import { disposeObject } from './utils/dispose.js';
 
@@ -211,7 +211,6 @@ function regenerate() {
     camera.lookAt(0, 0, 0);
     applyZoom();
     sdfRenderer.syncCamera(camera);
-    updateTriangleCounter(0);
     return;
   }
 
@@ -230,9 +229,6 @@ function regenerate() {
     currentRoot = root;
     frameObject(camera, root);
     applyZoom();
-    updateTriangleCounter(countTriangles(output));
-  } else {
-    updateTriangleCounter(0);
   }
 }
 
