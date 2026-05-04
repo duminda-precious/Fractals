@@ -75,6 +75,7 @@ export function buildGUI(pipeline, { onChange, api } = {}) {
     view.add(pipeline.rotation, 'y', -180, 180).name('Rot Y').decimals(1).onChange(() => api?.pushRotation?.()),
     view.add(pipeline.rotation, 'z', -180, 180).name('Rot Z').decimals(1).onChange(() => api?.pushRotation?.()),
   ];
+  view.add(pipeline, 'autoRotateZ').name('Auto Rotate Z ▶');
   view.add({ resetRotation: () => api?.resetRotation?.() }, 'resetRotation').name('Reset Rotation');
 
 }

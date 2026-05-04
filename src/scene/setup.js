@@ -40,7 +40,9 @@ export function createScene(container, { onBeforeRender } = {}) {
   const clock = new THREE.Clock();
   function animate() {
     requestAnimationFrame(animate);
-    if (onBeforeRender) onBeforeRender({ camera, scene, elapsed: clock.getElapsedTime() });
+    const delta = clock.getDelta();
+    const elapsed = clock.getElapsedTime();
+    if (onBeforeRender) onBeforeRender({ camera, scene, elapsed, delta });
     renderer.render(scene, camera);
   }
   animate();

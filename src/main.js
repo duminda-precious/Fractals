@@ -73,7 +73,8 @@ const pipeline = {
   crystal: getCrystalDefaults(),
   mandelbox: getMandelboxDefaults(),
   rotation: { x: 0, y: 0, z: 0 },
-  appearance: { ...DEFAULT_APPEARANCE }
+  appearance: { ...DEFAULT_APPEARANCE },
+  autoRotateZ: false
 };
 
 export const api = {
@@ -154,10 +155,23 @@ function syncRotationDisplay() {
 }
 
 const { renderer, scene, camera, lights } = createScene(container, {
-  onBeforeRender: ({ camera: cam, elapsed }) => {
+  onBeforeRender: ({ camera: cam, elapsed, delta }) => {
     if (sdfRenderer) {
       sdfRenderer.syncCamera(cam);
       sdfRenderer.tick(elapsed);
+    }
+
+    if (pipeline.autoRotateZ) {
+      const speed = 0.5; // radians per second
+      const qInc = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), delta * speed);
+      objectControls.quaternion.multiply(qInc);
+      
+      if (sdfRenderer) {
+        sdfRenderer.setRotation(objectControls.getInverseMatrix3());
+      } else if (currentRoot) {
+        currentRoot.quaternion.copy(objectControls.quaternion);
+      }
+      syncRotationDisplay();
     }
   }
 });
