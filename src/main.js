@@ -110,7 +110,7 @@ let _restorationTimer = null;
 function sdfInteractionStart() {
   if (!activeSDFRenderer()) return;
   clearTimeout(_restorationTimer);
-  renderer.setSize(window.innerWidth / 2, window.innerHeight / 2, false);
+  renderer.setSize(window.innerWidth / 1, window.innerHeight / 1, false);
 }
 function sdfInteractionEnd() {
   if (!activeSDFRenderer()) return;
@@ -140,8 +140,8 @@ function syncRotationDisplay() {
 
 function activeSDFRenderer() {
   if (pipeline.shapeType === 'mandelbulb') return bulbRenderer;
-  if (pipeline.shapeType === 'crystal')    return crystalRenderer;
-  if (pipeline.shapeType === 'mandelbox')  return boxRenderer;
+  if (pipeline.shapeType === 'crystal') return crystalRenderer;
+  if (pipeline.shapeType === 'mandelbox') return boxRenderer;
   return null;
 }
 
@@ -158,7 +158,7 @@ const { renderer, scene, camera } = createScene(container, {
 // Drag-to-rotate-object controls. Camera, lights and world stay still.
 const objectControls = createObjectControls(renderer.domElement, {
   onDragStart: () => sdfInteractionStart(),
-  onDragEnd:   () => sdfInteractionEnd(),
+  onDragEnd: () => sdfInteractionEnd(),
   onChange: (q) => {
     const sdf = activeSDFRenderer();
     if (sdf) {
@@ -222,9 +222,9 @@ function regenerate() {
   clearCurrent();
 
   // Tear down any prior SDF renderer (its proxy geometry was disposed above).
-  if (bulbRenderer)    { bulbRenderer.dispose();    bulbRenderer = null; }
+  if (bulbRenderer) { bulbRenderer.dispose(); bulbRenderer = null; }
   if (crystalRenderer) { crystalRenderer.dispose(); crystalRenderer = null; }
-  if (boxRenderer)     { boxRenderer.dispose();     boxRenderer = null; }
+  if (boxRenderer) { boxRenderer.dispose(); boxRenderer = null; }
 
   if (pipeline.shapeType === 'mandelbulb' || pipeline.shapeType === 'crystal' || pipeline.shapeType === 'mandelbox') {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, PIXEL_RATIO.sdf));
@@ -249,7 +249,7 @@ function regenerate() {
 
     camera.position.set(...CAMERA.positionSDF);
     camera.near = CAMERA.near;
-    camera.far  = CAMERA.farSDF;
+    camera.far = CAMERA.farSDF;
     camera.lookAt(0, 0, 0);
     applyZoom();
     sdf.syncCamera(camera);
