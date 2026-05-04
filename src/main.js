@@ -21,7 +21,8 @@ import { disposeObject } from './utils/dispose.js';
 import { createMandelbulbRenderer, getMandelbulbDefaults } from './renderers/mandelbulbRenderer.js';
 import { createCrystalRenderer, getCrystalDefaults } from './renderers/crystalRenderer.js';
 import { createMandelboxRenderer, getMandelboxDefaults } from './renderers/mandelboxRenderer.js';
-import { CAMERA, PIXEL_RATIO, ZOOM } from './world.js';
+import { syncAppearanceUniforms, anglesToDir } from './renderers/sdfUtils.js';
+import { CAMERA, PIXEL_RATIO, ZOOM, DEFAULT_APPEARANCE } from './world.js';
 
 registerGenerator('geodesic', geodesicGenerator);
 registerGenerator('polyhedron', polyhedronGenerator);
@@ -71,7 +72,8 @@ const pipeline = {
   mandelbulb: getMandelbulbDefaults(),
   crystal: getCrystalDefaults(),
   mandelbox: getMandelboxDefaults(),
-  rotation: { x: 0, y: 0, z: 0 }
+  rotation: { x: 0, y: 0, z: 0 },
+  appearance: { ...DEFAULT_APPEARANCE }
 };
 
 export const api = {
@@ -94,7 +96,8 @@ export const api = {
     } else if (currentRoot) {
       currentRoot.quaternion.copy(q);
     }
-  }
+  },
+  applyAppearance() { applyAppearance(); }
 };
 
 const container = document.getElementById('app');
@@ -119,6 +122,27 @@ function applyZoom() {
   camera.updateProjectionMatrix();
 }
 
+function applyAppearance() {
+  const a = pipeline.appearance;
+  // Scene background
+  scene.background.set(a.background);
+  // Mesh material
+  clayMaterial.color.set(a.surfaceLit);
+  clayMaterial.roughness = a.roughness;
+  // Three.js lights (mesh path)
+  lights.ambient.color.set(a.background);
+  lights.ambient.intensity = a.ambient;
+  lights.key.color.set(a.keyColor);
+  lights.key.intensity = a.keyIntensity;
+  lights.key.position.copy(anglesToDir(a.keyAzimuth, a.keyElevation)).multiplyScalar(20);
+  lights.hemi.color.set(a.fillColor);
+  lights.hemi.intensity = a.fillIntensity;
+  // SDF uniforms
+  if (sdfRenderer) {
+    syncAppearanceUniforms(sdfRenderer.material.uniforms, a);
+  }
+}
+
 // Cached Euler — avoids allocating a new object on every drag frame.
 const _euler = new THREE.Euler();
 function syncRotationDisplay() {
@@ -129,7 +153,7 @@ function syncRotationDisplay() {
   refreshRotation();
 }
 
-const { renderer, scene, camera } = createScene(container, {
+const { renderer, scene, camera, lights } = createScene(container, {
   onBeforeRender: ({ camera: cam, elapsed }) => {
     if (sdfRenderer) {
       sdfRenderer.syncCamera(cam);
@@ -211,6 +235,7 @@ function regenerate() {
     camera.lookAt(0, 0, 0);
     applyZoom();
     sdfRenderer.syncCamera(camera);
+    applyAppearance();
     return;
   }
 

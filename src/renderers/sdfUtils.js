@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { COLORS, CAMERA } from '../world.js';
+import { COLORS, CAMERA, SDF_LIGHTING } from '../world.js';
 
 // ── Shared vertex shader ───────────────────────────────────────────────────────
 export const SDF_VERT = /* glsl */ `
@@ -27,6 +27,15 @@ export const SDF_COMMON_UNIFORMS_GLSL = /* glsl */ `
   uniform vec3  uColorB;
   uniform vec3  uBgColor;
   uniform float uTime;
+
+  uniform vec3  uKeyDir;
+  uniform vec3  uKeyColor;
+  uniform float uKeyIntensity;
+  uniform vec3  uFillDir;
+  uniform vec3  uFillColor;
+  uniform float uFillIntensity;
+  uniform float uAmbient;
+  uniform float uRoughness;
 `;
 
 // ── GLSL: ray vs AABB slab test ────────────────────────────────────────────────
@@ -68,9 +77,6 @@ export function estimateNormalGLSL() {
 export function sdfMarchGLSL({ stepFactor = 0.5 } = {}) {
   return /* glsl */ `
     vec4 march(vec3 ro, vec3 rd) {
-      // Transform ray to local SDF frame and test against bounding box.
-      // Background pixels (the majority) exit in O(1) instead of burning
-      // all march steps through empty space.
       vec3 roL = uObjectRotInv * ro;
       vec3 rdL = uObjectRotInv * rd;
       vec2 box = rayBox(roL, rdL, uBoundingBox);
@@ -85,10 +91,29 @@ export function sdfMarchGLSL({ stepFactor = 0.5 } = {}) {
         float d = worldDE(p);
         if (d < uMinDist) {
           vec3 n = estimateNormal(p);
-          float key      = max(dot(n, KEY_DIR),  0.0);
-          float fill     = max(dot(n, FILL_DIR), 0.0);
-          float lighting = AMBIENT + KEY_INTENSITY * key + FILL_INTENSITY * fill;
-          return vec4(mix(uColorB, uColorA, clamp(lighting, 0.0, 1.0)), 1.0);
+          
+          // Diffuse
+          float key  = max(dot(n, uKeyDir),  0.0);
+          float fill = max(dot(n, uFillDir), 0.0);
+          
+          // Specular (Blinn-Phong)
+          vec3 viewDir = -rd;
+          float specPower = mix(120.0, 2.0, uRoughness);
+          float specMask = (1.0 - uRoughness);
+
+          vec3 halfKey = normalize(uKeyDir + viewDir);
+          float specKey = pow(max(dot(n, halfKey), 0.0), specPower) * specMask;
+
+          vec3 halfFill = normalize(uFillDir + viewDir);
+          float specFill = pow(max(dot(n, halfFill), 0.0), specPower) * specMask;
+          
+          vec3 diffuse = uKeyColor * uKeyIntensity * key + uFillColor * uFillIntensity * fill;
+          vec3 specular = (uKeyColor * specKey * uKeyIntensity) + (uFillColor * specFill * uFillIntensity);
+          
+          vec3 ambient = uBgColor * uAmbient;
+          vec3 litColor = (uColorA * diffuse) + (uColorA * ambient) + specular;
+          
+          return vec4(mix(uColorB, litColor, clamp(key + fill + uAmbient, 0.0, 1.0)), 1.0);
         }
         if (t > tLimit) break;
         t += d * ${stepFactor.toFixed(2)};
@@ -110,7 +135,6 @@ export const SDF_MAIN_GLSL = /* glsl */ `
 `;
 
 // ── JS: base Three.js uniforms shared by all SDF renderers ────────────────────
-// boundingBox: vec3 half-extents of the shape's tight AABB.
 export function sdfBaseUniforms(boundingBox) {
   return {
     uBoundingBox:    { value: (boundingBox || new THREE.Vector3(1.5, 1.5, 1.5)).clone() },
@@ -123,7 +147,42 @@ export function sdfBaseUniforms(boundingBox) {
     uColorB:         { value: new THREE.Color(COLORS.shadow) },
     uBgColor:        { value: new THREE.Color(COLORS.background) },
     uTime:           { value: 0 },
+    // Lighting uniforms
+    uKeyDir:         { value: new THREE.Vector3(...SDF_LIGHTING.keyDir) },
+    uKeyColor:       { value: new THREE.Color(0xffffff) },
+    uKeyIntensity:   { value: SDF_LIGHTING.keyIntensity },
+    uFillDir:        { value: new THREE.Vector3(...SDF_LIGHTING.fillDir) },
+    uFillColor:      { value: new THREE.Color(0x8090b0) },
+    uFillIntensity:  { value: SDF_LIGHTING.fillIntensity },
+    uAmbient:        { value: SDF_LIGHTING.ambient },
+    uRoughness:      { value: 0.75 },
   };
+}
+
+// ── JS: convert azimuth/elevation degrees to normalized direction ─────────────
+export function anglesToDir(azimuthDeg, elevationDeg) {
+  const az = THREE.MathUtils.degToRad(azimuthDeg);
+  const el = THREE.MathUtils.degToRad(elevationDeg);
+  return new THREE.Vector3(
+    Math.cos(el) * Math.sin(az),
+    Math.sin(el),
+    Math.cos(el) * Math.cos(az)
+  );
+}
+
+// ── JS: sync appearance state into SDF shader uniforms ────────────────────────
+export function syncAppearanceUniforms(uniforms, appearance) {
+  uniforms.uColorA.value.set(appearance.surfaceLit);
+  uniforms.uColorB.value.set(appearance.surfaceShadow);
+  uniforms.uBgColor.value.set(appearance.background);
+  uniforms.uKeyDir.value.copy(anglesToDir(appearance.keyAzimuth, appearance.keyElevation));
+  uniforms.uKeyColor.value.set(appearance.keyColor);
+  uniforms.uKeyIntensity.value = appearance.keyIntensity;
+  uniforms.uFillDir.value.copy(anglesToDir(appearance.fillAzimuth, appearance.fillElevation));
+  uniforms.uFillColor.value.set(appearance.fillColor);
+  uniforms.uFillIntensity.value = appearance.fillIntensity;
+  uniforms.uAmbient.value = appearance.ambient;
+  uniforms.uRoughness.value = appearance.roughness;
 }
 
 // ── JS: create 500³ proxy mesh + attach shared SDF renderer methods ───────────

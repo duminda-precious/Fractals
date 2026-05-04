@@ -37,6 +37,34 @@ export function buildGUI(pipeline, { onChange, api } = {}) {
 
   SHAPE_GUI[pipeline.shapeType]?.(pipeline, gui, shapeFolder, { onChange, api });
 
+  // ── Material ──
+  const appearance = pipeline.appearance;
+  const apply = () => api?.applyAppearance?.();
+
+  const mat = gui.addFolder('Material');
+  mat.addColor(appearance, 'surfaceLit').name('Surface (Lit)').onChange(apply);
+  mat.addColor(appearance, 'surfaceShadow').name('Surface (Shadow)').onChange(apply);
+  mat.add(appearance, 'roughness', 0, 1, 0.01).name('Roughness').onChange(apply);
+
+  // ── Lighting ──
+  const lighting = gui.addFolder('Lighting');
+  const keyF = lighting.addFolder('Key Light');
+  keyF.addColor(appearance, 'keyColor').name('Color').onChange(apply);
+  keyF.add(appearance, 'keyIntensity', 0, 2, 0.05).name('Intensity').onChange(apply);
+  keyF.add(appearance, 'keyAzimuth', -180, 180, 1).name('Angle').onChange(apply);
+  keyF.add(appearance, 'keyElevation', -90, 90, 1).name('Height').onChange(apply);
+  const fillF = lighting.addFolder('Fill Light');
+  fillF.addColor(appearance, 'fillColor').name('Color').onChange(apply);
+  fillF.add(appearance, 'fillIntensity', 0, 1, 0.05).name('Intensity').onChange(apply);
+  fillF.add(appearance, 'fillAzimuth', -180, 180, 1).name('Angle').onChange(apply);
+  fillF.add(appearance, 'fillElevation', -90, 90, 1).name('Height').onChange(apply);
+  lighting.add(appearance, 'ambient', 0, 1, 0.05).name('Ambient').onChange(apply);
+
+  // ── Background ──
+  const bg = gui.addFolder('Background');
+  bg.addColor(appearance, 'background').name('Color').onChange(apply);
+
+  // ── View ──
   const view = gui.addFolder('View');
   view.add(pipeline, 'zoom', ZOOM.min, ZOOM.max, ZOOM.step)
     .name('Zoom')

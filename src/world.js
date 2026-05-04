@@ -5,10 +5,32 @@
 
 // ── Colors ────────────────────────────────────────────────────────────────────
 export const COLORS = {
-  background:   0x111416,   // scene clear color + shader miss color
-  lit:          0xe8e0d8,   // warm clay — bright/key-lit surface areas
-  shadow:       0x2a3340,   // cool dark blue — shadow/fill surface areas
-  wireframe:    0x88aaff,   // wireframe overlay on sphere meshes
+  background:   0x111416,
+  lit:          0xe8e0d8,
+  shadow:       0x2a3340,
+  wireframe:    0x88aaff,
+};
+
+// ── Default appearance (user-controllable via GUI) ────────────────────────────
+export const DEFAULT_APPEARANCE = {
+  // Material
+  surfaceLit:      '#e8e0d8',
+  surfaceShadow:   '#2a3340',
+  roughness:       0.75,
+  // Key light
+  keyColor:        '#ffffff',
+  keyIntensity:    0.85,
+  keyAzimuth:      35,
+  keyElevation:    55,
+  // Fill light
+  fillColor:       '#8090b0',
+  fillIntensity:   0.25,
+  fillAzimuth:     -140,
+  fillElevation:   25,
+  // Ambient
+  ambient:         0.30,
+  // Background
+  background:      '#111416',
 };
 
 // ── Camera ────────────────────────────────────────────────────────────────────
@@ -41,19 +63,7 @@ export const SDF_LIGHTING = {
   fillIntensity: 0.25,
 };
 
-// Returns a GLSL const block for the SDF lighting rig, injected into each
-// SDF fragment shader so the values are true compile-time constants while
-// still being defined in a single JS source-of-truth.
-export function sdfLightingGLSL() {
-  const l = SDF_LIGHTING;
-  return /* glsl */ `
-    const vec3  KEY_DIR        = vec3(${l.keyDir.join(', ')});
-    const vec3  FILL_DIR       = vec3(${l.fillDir.join(', ')});
-    const float AMBIENT        = ${l.ambient.toFixed(2)};
-    const float KEY_INTENSITY  = ${l.keyIntensity.toFixed(2)};
-    const float FILL_INTENSITY = ${l.fillIntensity.toFixed(2)};
-  `;
-}
+// sdfLightingGLSL() removed — lighting now uses runtime uniforms (see sdfUtils.js).
 
 // ── Zoom ─────────────────────────────────────────────────────────────────────
 // Zoom works by scaling the camera FOV: fov = CAMERA.fov / zoom.

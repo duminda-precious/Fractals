@@ -45,7 +45,7 @@ export function createScene(container, { onBeforeRender } = {}) {
   }
   animate();
 
-  return { renderer, scene, camera };
+  return { renderer, scene, camera, lights: { ambient, key, hemi } };
 }
 
 // One-shot camera framing. Call after creating an object to position the

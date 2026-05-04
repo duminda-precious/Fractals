@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { sdfLightingGLSL } from '../world.js';
 import {
   SDF_VERT, SDF_COMMON_UNIFORMS_GLSL, SDF_MAIN_GLSL,
   rayBoxGLSL, estimateNormalGLSL, sdfMarchGLSL,
@@ -7,7 +6,6 @@ import {
 } from './sdfUtils.js';
 
 const FRAG = /* glsl */ `
-  ${sdfLightingGLSL()}
   ${rayBoxGLSL()}
   ${SDF_COMMON_UNIFORMS_GLSL}
 
