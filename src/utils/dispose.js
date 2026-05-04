@@ -1,0 +1,25 @@
+// Recursive disposal of GPU resources for an Object3D / Group / Mesh.
+// Materials are NOT disposed by default because the app reuses a shared material.
+export function disposeObject(obj, { disposeMaterials = false } = {}) {
+  if (!obj) return;
+  obj.traverse?.((child) => {
+    if (child.geometry) child.geometry.dispose();
+    if (disposeMaterials && child.material) {
+      const mats = Array.isArray(child.material) ? child.material : [child.material];
+      for (const m of mats) m.dispose?.();
+    }
+  });
+  if (obj.parent) obj.parent.remove(obj);
+}
+
+// Dispose a bare BufferGeometry or Group of geometries (no scene attachment).
+export function disposeGeometry(geo) {
+  if (!geo) return;
+  if (geo.isBufferGeometry) {
+    geo.dispose();
+  } else if (geo.traverse) {
+    geo.traverse((child) => {
+      if (child.geometry) child.geometry.dispose();
+    });
+  }
+}
