@@ -30,7 +30,7 @@ export const DEFAULT_APPEARANCE = {
   // Ambient
   ambient:         0.15,
   // Background
-  background:      '#ffffff',
+  background:      '#dedede',
 };
 
 // ── Camera ────────────────────────────────────────────────────────────────────
