@@ -14,12 +14,12 @@ export const COLORS = {
 // ── Default appearance (user-controllable via GUI) ────────────────────────────
 export const DEFAULT_APPEARANCE = {
   // Material
-  surfaceLit:      '#6b97ff',
-  surfaceShadow:   '#247fff',
-  roughness:       0.84,
+  surfaceLit:      '#004cff',
+  surfaceShadow:   '#006aff',
+  roughness:       0.96,
   // Key light
   keyColor:        '#ffffff',
-  keyIntensity:    1,
+  keyIntensity:    1.05,
   keyAzimuth:      -28,
   keyElevation:    -22,
   // Fill light

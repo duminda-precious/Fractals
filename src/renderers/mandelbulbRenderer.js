@@ -56,11 +56,11 @@ const FRAG = /* glsl */ `
 `;
 
 const DEFAULT_PARAMS = Object.freeze({
-  power: 7.1,
-  iterations: 6,
-  bailout: 4.0,
-  juliaMode: false,
-  juliaC: [0, 0, 0],
+  power: 2.0,
+  iterations: 12,
+  bailout: 3.25,
+  juliaMode: true,
+  juliaC: [1.048, -0.333, 1.2991],
   maxSteps: 96,
   minDist: 5e-4,
   maxDist: 40.0
