@@ -72,9 +72,9 @@ const pipeline = {
   mandelbulb: getMandelbulbDefaults(),
   crystal: getCrystalDefaults(),
   mandelbox: getMandelboxDefaults(),
-  rotation: { x: 0, y: 0, z: 0 },
+  rotation: { x: -39.8, y: 17.3, z: -160.5 },
   appearance: { ...DEFAULT_APPEARANCE },
-  autoRotateZ: false
+  autoRotateZ: true
 };
 
 export const api = {
@@ -288,5 +288,6 @@ function onChange(structural = false) {
   }
 }
 
+api.pushRotation(); // apply default rotation before first render
 buildGUI(pipeline, { onChange, api });
 regenerate();

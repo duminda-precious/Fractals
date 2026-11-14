@@ -56,9 +56,9 @@ const FRAG = /* glsl */ `
 `;
 
 const DEFAULT_PARAMS = Object.freeze({
-  power: 8.0,
-  iterations: 10,
-  bailout: 2.0,
+  power: 7.1,
+  iterations: 6,
+  bailout: 4.0,
   juliaMode: false,
   juliaC: [0, 0, 0],
   maxSteps: 96,

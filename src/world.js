@@ -14,23 +14,23 @@ export const COLORS = {
 // ── Default appearance (user-controllable via GUI) ────────────────────────────
 export const DEFAULT_APPEARANCE = {
   // Material
-  surfaceLit:      '#e8e0d8',
-  surfaceShadow:   '#2a3340',
-  roughness:       0.75,
+  surfaceLit:      '#6b97ff',
+  surfaceShadow:   '#247fff',
+  roughness:       0.84,
   // Key light
   keyColor:        '#ffffff',
-  keyIntensity:    0.85,
-  keyAzimuth:      35,
-  keyElevation:    55,
+  keyIntensity:    1,
+  keyAzimuth:      -28,
+  keyElevation:    -22,
   // Fill light
-  fillColor:       '#8090b0',
-  fillIntensity:   0.25,
+  fillColor:       '#f7f7f7',
+  fillIntensity:   0,
   fillAzimuth:     -140,
   fillElevation:   25,
   // Ambient
-  ambient:         0.30,
+  ambient:         0.15,
   // Background
-  background:      '#111416',
+  background:      '#ffffff',
 };
 
 // ── Camera ────────────────────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ export const SDF_LIGHTING = {
 // Zoom works by scaling the camera FOV: fov = CAMERA.fov / zoom.
 // Higher zoom = narrower FOV = objects appear larger.
 export const ZOOM = {
-  default: 1.0,
+  default: 1.15,
   min:     0.2,
   max:     4.0,
   step:    0.05,
