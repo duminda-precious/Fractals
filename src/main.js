@@ -154,6 +154,9 @@ function syncRotationDisplay() {
   refreshRotation();
 }
 
+// Declared before createScene: its render loop can fire before controls exist.
+let objectControls = null;
+
 const { renderer, scene, camera, lights } = createScene(container, {
   onBeforeRender: ({ camera: cam, elapsed, delta }) => {
     if (sdfRenderer) {
@@ -161,7 +164,7 @@ const { renderer, scene, camera, lights } = createScene(container, {
       sdfRenderer.tick(elapsed);
     }
 
-    if (pipeline.autoRotateZ) {
+    if (pipeline.autoRotateZ && objectControls) {
       const speed = 0.5; // radians per second
       const qInc = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), delta * speed);
       objectControls.quaternion.multiply(qInc);
@@ -176,7 +179,7 @@ const { renderer, scene, camera, lights } = createScene(container, {
   }
 });
 
-const objectControls = createObjectControls(renderer.domElement, {
+objectControls = createObjectControls(renderer.domElement, {
   onDragStart: () => sdfInteractionStart(),
   onDragEnd: () => sdfInteractionEnd(),
   onChange: (q) => {
