@@ -14,6 +14,12 @@ const SHAPE_GUI = {
 
 let gui = null;
 let rotControllers = [];
+let panelOpen = true; // survives GUI rebuilds
+
+// The preview container shrinks to make room for the open panel (see index.html).
+function syncPanelLayout() {
+  document.body.classList.toggle('panel-open', panelOpen);
+}
 
 export function refreshDisplays() {
   if (!gui) return;
@@ -29,6 +35,14 @@ export function buildGUI(pipeline, { onChange, api } = {}) {
   rotControllers = [];
 
   gui = new GUI({ title: 'Fractal Explorer' });
+  if (!panelOpen) gui.close();
+  syncPanelLayout();
+  const root = gui;
+  gui.onOpenClose((changed) => {
+    if (changed !== root) return; // ignore sub-folders
+    panelOpen = !root._closed;
+    syncPanelLayout();
+  });
 
   const shapeFolder = gui.addFolder('Shape');
   shapeFolder.add(pipeline, 'shapeType', Object.keys(SHAPE_GUI))

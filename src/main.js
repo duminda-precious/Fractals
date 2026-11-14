@@ -108,13 +108,13 @@ let _restorationTimer = null;
 function sdfInteractionStart() {
   if (!sdfRenderer) return;
   clearTimeout(_restorationTimer);
-  renderer.setSize(window.innerWidth / 1, window.innerHeight / 1, false);
+  renderer.setSize(container.clientWidth, container.clientHeight, false);
 }
 function sdfInteractionEnd() {
   if (!sdfRenderer) return;
   clearTimeout(_restorationTimer);
   _restorationTimer = setTimeout(() => {
-    renderer.setSize(window.innerWidth, window.innerHeight, true);
+    renderer.setSize(container.clientWidth, container.clientHeight, true);
   }, 300);
 }
 

@@ -7,7 +7,7 @@ import { COLORS, CAMERA, LIGHTS, PIXEL_RATIO } from '../world.js';
 export function createScene(container, { onBeforeRender } = {}) {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, PIXEL_RATIO.mesh));
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(container.clientWidth || 1, container.clientHeight || 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   container.appendChild(renderer.domElement);
 
@@ -16,7 +16,7 @@ export function createScene(container, { onBeforeRender } = {}) {
 
   const camera = new THREE.PerspectiveCamera(
     CAMERA.fov,
-    window.innerWidth / window.innerHeight,
+    (container.clientWidth || 1) / (container.clientHeight || 1),
     CAMERA.near,
     CAMERA.farMesh
   );
@@ -30,12 +30,17 @@ export function createScene(container, { onBeforeRender } = {}) {
   const hemi = new THREE.HemisphereLight(LIGHTS.hemi.sky, LIGHTS.hemi.ground, LIGHTS.hemi.intensity);
   scene.add(ambient, key, hemi);
 
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
+  // Track the container (not the window) so the preview resizes when the
+  // control panel opens or closes as well as on window resize.
+  const resize = () => {
+    const w = container.clientWidth || 1;
+    const h = container.clientHeight || 1;
+    camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, PIXEL_RATIO.mesh));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
+    renderer.setSize(w, h);
+  };
+  new ResizeObserver(resize).observe(container);
 
   const clock = new THREE.Clock();
   function animate() {

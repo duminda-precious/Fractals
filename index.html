@@ -17,9 +17,22 @@
       color: #e8e0d8;
     }
 
+    :root {
+      --panel-w: 320px;
+    }
+
+    /* Preview fills the viewport; when the Fractal Explorer panel is open it
+       gives up the panel's width on the right. */
     #app {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+
+    body.panel-open #app {
+      right: var(--panel-w);
     }
 
     canvas {
@@ -27,7 +40,13 @@
     }
 
     .lil-gui {
-      --width: 320px;
+      --width: var(--panel-w);
+    }
+
+    /* Pin the Fractal Explorer flush to the right edge. */
+    .lil-gui.root {
+      top: 0;
+      right: 0;
     }
   </style>
 </head>
